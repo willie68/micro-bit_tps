@@ -1,6 +1,12 @@
-The actual command implementation list for the microbit V2:
+# micro:bit TPS
 
+This is my implementation of the TPS. The instructions will be compatible to my ArduinoSPS Version. And you will get some nice new Commands, implementing some of the micro:bit features, like images, Soundlevel, Logo...
 
+If you find a bug, feel free to create a issue in the tracker. 
+
+# Command implementation Chart
+
+The actual command implementation list for the microbit V2: 
 
 |      | 0                                        | 1           | 2            | 3                         | 4         | 5                | 6            | 7                     |
 | ---- | ---------------------------------------- | ----------- | ------------ | ------------------------- | --------- | ---------------- | ------------ | --------------------- |
