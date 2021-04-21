@@ -3,6 +3,8 @@ import music
 import gc
 gc.collect()
 
+DEBUG = True
+SINGLESTEP = True
 CRLF='\r\n'
 #default filename for tps file
 TPS_FILENAME='microtps.bin'
@@ -390,6 +392,8 @@ def run():
     DATA=0
     Row=0
 
+    dbgtmp=bytearray(1)
+    
 # initialise the interpreter
 
 # loading the actual program file
@@ -410,6 +414,43 @@ def run():
         # getting instruction and data
         INST=hi_nib(PC)
         DATA=lo_nib(PC)
+
+        if DEBUG :
+            writeln("-")
+            uart.write("PC: ")
+            printHex16(PC)
+            writeln("")
+            uart.write("INST: ")
+            dbgtmp[0] = nibbleToHex(INST)
+            uart.write(dbgtmp)
+            uart.write(", DATA: ")
+            dbgtmp[0] = nibbleToHex(DATA)            
+            uart.write(dbgtmp)
+            writeln("")
+            writeln("Register:")
+            uart.write("A: ")
+            printHex8(A)
+            uart.write(", B: ")
+            printHex8(B)
+            uart.write(", C: ")
+            printHex8(C)
+            writeln("")
+            uart.write("D: ")
+            printHex8(D)
+            uart.write(", E: ")
+            printHex8(E)
+            uart.write(", F: ")
+            printHex8(F)
+            writeln("")
+            uart.write("Page: ")
+            printHex8(PAGE)
+            uart.write(", Ret: ")
+            printHex16(RET)
+            writeln("")
+            if SINGLESTEP: 
+                line = ""
+                while not line:
+                    line = uart.readline()
 
         if INST==0x00:
             if DATA==0x01:
@@ -637,7 +678,13 @@ def run():
             elif DATA==0x0D:
                 A = pin_logo.is_touched() == True
            
-                
+        A = A & 0xff
+        B = B & 0xff
+        C = C & 0xff
+        D = D & 0xff
+        E = E & 0xff
+        F = F & 0xff
+ 
         PC=(PC+1)%E2END
 
 init()
