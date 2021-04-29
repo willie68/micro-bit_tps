@@ -4,15 +4,16 @@ import gc
 import os
 gc.collect()
 
-DEBUG = True
-SINGLESTEP = False
-CRLF = "\r\n"
-TPS_FILENAME = "tps.bin"
-E2END = 1024
-p = bytearray(E2END)
+PN="micro:bit v2"
+DBG = True
+ST = False
+CR = "\r\n"
+TFN = "tps.bin"
+E2E = 1024
+
+p = bytearray(E2E)
 stack = bytearray(16)
 stackp = 0
-
 music_note = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"]
 subs = [0, 0, 0, 0, 0, 0]
 wait = [1, 2, 5]
@@ -92,13 +93,13 @@ def map(a, x1, y1, x2, y2):
 
 def writeln(msg):
     uart.write(msg)
-    uart.write(CRLF)
+    uart.write(CR)
 
 def save(fn):
     try:
         os.remove(fn)
     except OSError:
-        writeln("Can't read file %s" % fn)
+        writeln("rw error %s" % fn)
     with open(fn, "wb") as mb:
         mb.write(p)
 
@@ -106,9 +107,8 @@ def load(fn):
     try:
         with open(fn, "rb") as mb:
             mb.readinto(p)
-        writeln("reading ok")
     except OSError:
-        writeln("Can't read file %s" % fn)
+        writeln("rw error %s" % fn)
 
 def hi_nib(pb):
     return (p[pb] >> 4) & 0x0F
@@ -145,7 +145,7 @@ def printCheckSum(value):
     checksum = value & 0xFF
     checksum = (checksum ^ 0xFF) + 1
     printHex8(checksum)
-    uart.write(CRLF)
+    uart.write(CR)
 
 def printHex8(num):
     tmp = bytearray(2)
@@ -155,11 +155,8 @@ def printHex8(num):
 
 def printHex16(num):
     tmp = bytearray(4)
-    tmp[0] = nibbleToHex(num >> 12)
-    tmp[1] = nibbleToHex(num >> 8)
-    tmp[2] = nibbleToHex(num >> 4)
-    tmp[3] = nibbleToHex(num)
-    uart.write(tmp)
+    printHex8(num>>8)
+    printHex8(num)
 
 def getNextChar():
     while not uart.any():
@@ -170,7 +167,6 @@ def getNextChar():
 def getMidiNote(note):
     if note >= 32 and note <= 108:
         tune = music_note[note % 12] + chr(ord("2") + (int(note / 12))) + ":4"
-        writeln("tune:" + tune)
         return tune
     return "C0:1"
 
@@ -181,7 +177,7 @@ def writeProgramSerial():
     display.show(Image.ARROW_N)
     writeln("program data:")
     checksum = 0
-    for addr in range(E2END):
+    for addr in range(E2E):
         value = p[addr]
         if (addr % 8) == 0:
             if addr > 0:
@@ -202,8 +198,8 @@ def serialprg():
     display.show(Image.DIAMOND)
     eOfp = False
     uart.init(baudrate=9600)
-    uart.write(CRLF)
-    writeln("micro_bit_v2")
+    uart.write(CR)
+    writeln(PN)
     writeln("waiting for command:")
     writeln("w: write HEX file, r: read file, e: end")
     while not eOfp:
@@ -268,9 +264,9 @@ def serialprg():
                     if eOfF:
                         break
                 writeln("endOfFile")
-                save(TPS_FILENAME)
+                save(TFN)
             if ch == "r":
-                load(TPS_FILENAME)
+                load(TFN)
                 writeProgramSerial()
             if ch == "e":
                 writeln("end")
@@ -281,7 +277,7 @@ def prg():
     PC = 0
     nib = 0
     moved = 1
-    load(TPS_FILENAME)
+    load(TFN)
     for i in range(2):
         for j in range(2):
             for k in range(4):
@@ -306,7 +302,7 @@ def prg():
             sleep(100)
         if button_b.is_pressed():
             moved = 1
-            nib = (nib + 1) % E2END
+            nib = (nib + 1) % E2E
             PC = nib >> 1
             if nib % 4 == 0:
                 for i in range(2):
@@ -329,7 +325,7 @@ def prg():
         sleep(100)
 
 def init():
-    for i in range(E2END):
+    for i in range(E2E):
         p[i] = 0xFF
     for i in range(4):
         Din[i].set_pull(Din[i].PULL_UP)
@@ -338,8 +334,8 @@ def init():
 
 def run():
     uart.init(baudrate=115200)
-    uart.write(CRLF)
-    writeln("micro:bit v2 running micro TPS")
+    uart.write(CR)
+    writeln(PN + " running microbit TPS")
 
     A = 0
     B = 0
@@ -356,10 +352,10 @@ def run():
     stackp = 0
     dbgtmp = bytearray(1)
 
-    load(TPS_FILENAME)
+    load(TFN)
     display.clear()
 
-    for i in range(E2END):
+    for i in range(E2E):
         INST = hi_nib(i)
         if INST == 0x0E:
             DATA = lo_nib(i)
@@ -370,7 +366,7 @@ def run():
         INST = hi_nib(PC)
         DATA = lo_nib(PC)
 
-        if DEBUG:
+        if DBG:
             writeln("-")
             uart.write("PC: ")
             printHex16(PC)
@@ -402,7 +398,7 @@ def run():
             uart.write(", Ret: ")
             printHex16(RET)
             writeln("")
-            if SINGLESTEP:
+            if ST:
                 line = ""
                 while not line:
                     line = uart.readline()
@@ -474,9 +470,7 @@ def run():
                 if stackp > 15:
                     stackp = 15
         elif INST == 0x06:
-            if DATA == 0x00:
-                PC = PC
-            elif DATA == 0x01:
+            if DATA == 0x01:
                 A = B
             elif DATA == 0x02:
                 A = C
@@ -628,7 +622,7 @@ def run():
         D = D & 0xFF
         E = E & 0xFF
         F = F & 0xFF
-        PC = (PC + 1) % E2END
+        PC = (PC + 1) % E2E
 
 init()
 if button_b.is_pressed():
