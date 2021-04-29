@@ -49,7 +49,7 @@ def nibbleToHex(value):
 	if c>=10 and c<=15:return c+ord('A')-10
 def printCheckSum(value):checksum=value&255;checksum=(checksum^255)+1;printHex8(checksum);uart.write(CR)
 def printHex8(num):tmp=bytearray(2);tmp[0]=nibbleToHex(num>>4);tmp[1]=nibbleToHex(num);uart.write(tmp)
-def printHex16(num):tmp=bytearray(4);printHex8(num>>8);printHex8(num)
+def printHex16(num):printHex8(num>>8);printHex8(num)
 def getNextChar():
 	while not uart.any():sleep(10)
 	c=uart.read(1);return chr(c[0])

@@ -154,7 +154,6 @@ def printHex8(num):
     uart.write(tmp)
 
 def printHex16(num):
-    tmp = bytearray(4)
     printHex8(num>>8)
     printHex8(num)
 
