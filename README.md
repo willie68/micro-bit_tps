@@ -70,6 +70,8 @@ LogoTouched: the logo was touched.
 
 ## Hardware assignments:
 
+**Caution**: Due to the dual assignment of pins (especially the two A / D converters) can cause effects on the circuit in both directions. Protective diodes may be required there.
+
  Button A is PRG or S1 (pin5)
  Button B is SEL or S2 (pin11)
  output pins 

@@ -1,631 +1,255 @@
+RWE='rw error %s'
 from microbit import *
-import music
-import gc
-import os
+import music,gc,os
 gc.collect()
-
-PN="micro:bit v2"
-DBG = True
-ST = False
-CR = "\r\n"
-TFN = "tps.bin"
-E2E = 1024
-
-p = bytearray(E2E)
-stack = bytearray(16)
-stackp = 0
-music_note = ["c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"]
-subs = [0, 0, 0, 0, 0, 0]
-wait = [1, 2, 5]
-Din = [pin13, pin14, pin15, pin16]
-Dout = [pin0, pin1, pin2, pin12]
-Aout = [pin8, pin9]
-Ain = [pin3, pin4]
-button = [button_a, button_b]
-images = {
-    1: Image.HEART,
-    2: Image.HAPPY,
-    3: Image.SMILE,
-    4: Image.SAD,
-    5: Image.CONFUSED,
-    6: Image.ANGRY,
-    7: Image.ASLEEP,
-    8: Image.SURPRISED,
-    9: Image.SILLY,
-    10: Image.FABULOUS,
-    11: Image.MEH,
-    12: Image.YES,
-    13: Image.NO,
-    14: Image.CLOCK1,
-    15: Image.CLOCK2,
-    16: Image.CLOCK3,
-    17: Image.CLOCK4,
-    18: Image.CLOCK5,
-    19: Image.CLOCK6,
-    20: Image.CLOCK7,
-    21: Image.CLOCK8,
-    22: Image.CLOCK9,
-    23: Image.CLOCK10,
-    24: Image.CLOCK11,
-    25: Image.CLOCK12,
-    26: Image.ARROW_N,
-    27: Image.ARROW_NE,
-    28: Image.ARROW_E,
-    29: Image.ARROW_SE,
-    30: Image.ARROW_S,
-    31: Image.ARROW_SW,
-    32: Image.ARROW_W,
-    33: Image.ARROW_NW,
-    34: Image.TRIANGLE,
-    35: Image.TRIANGLE_LEFT,
-    36: Image.CHESSBOARD,
-    37: Image.DIAMOND,
-    38: Image.DIAMOND_SMALL,
-    39: Image.SQUARE,
-    40: Image.SQUARE_SMALL,
-    41: Image.RABBIT,
-    42: Image.COW,
-    43: Image.MUSIC_CROTCHET,
-    44: Image.MUSIC_QUAVER,
-    45: Image.MUSIC_QUAVERS,
-    46: Image.PITCHFORK,
-    47: Image.XMAS,
-    48: Image.PACMAN,
-    49: Image.TARGET,
-    50: Image.TSHIRT,
-    51: Image.ROLLERSKATE,
-    52: Image.DUCK,
-    53: Image.HOUSE,
-    54: Image.TORTOISE,
-    55: Image.BUTTERFLY,
-    56: Image.STICKFIGURE,
-    57: Image.GHOST,
-    58: Image.SWORD,
-    59: Image.GIRAFFE,
-    60: Image.SKULL,
-    61: Image.UMBRELLA,
-    62: Image.SNAKE,
-    63: Image.HEART_SMALL
-}
-
-def map(a, x1, y1, x2, y2):
-    return int((a - x1) * (y2 - x2) / (y1 - x1) + x2)
-
-def writeln(msg):
-    uart.write(msg)
-    uart.write(CR)
-
+BT=True
+BF=False
+DBG=BF
+ST=BF
+PN='micro:bit v2'
+CR='\r\n'
+TFN='tps.bin'
+E2E=1024
+p=bytearray(E2E)
+STK=bytearray(16)
+STP=0
+SEL=button_a
+PRG=button_b
+music_note=['c','c#','d','d#','e','f','f#','g','g#','a','a#','b']
+SB=[0,0,0,0,0,0]
+WT=[1,2,5]
+DI=[pin13,pin14,pin15,pin16]
+DO=[pin0,pin1,pin2,pin12]
+AO=[pin8,pin9]
+AI=[pin3,pin4]
+images={1:Image.HEART,2:Image.HAPPY,3:Image.SMILE,4:Image.SAD,5:Image.CONFUSED,6:Image.ANGRY,7:Image.ASLEEP,8:Image.SURPRISED,9:Image.SILLY,10:Image.FABULOUS,11:Image.MEH,12:Image.YES,13:Image.NO,14:Image.CLOCK1,15:Image.CLOCK2,16:Image.CLOCK3,17:Image.CLOCK4,18:Image.CLOCK5,19:Image.CLOCK6,20:Image.CLOCK7,21:Image.CLOCK8,22:Image.CLOCK9,23:Image.CLOCK10,24:Image.CLOCK11,25:Image.CLOCK12,26:Image.ARROW_N,27:Image.ARROW_NE,28:Image.ARROW_E,29:Image.ARROW_SE,30:Image.ARROW_S,31:Image.ARROW_SW,32:Image.ARROW_W,33:Image.ARROW_NW,34:Image.TRIANGLE,35:Image.TRIANGLE_LEFT,36:Image.CHESSBOARD,37:Image.DIAMOND,38:Image.DIAMOND_SMALL,39:Image.SQUARE,40:Image.SQUARE_SMALL,41:Image.RABBIT,42:Image.COW,43:Image.MUSIC_CROTCHET,44:Image.MUSIC_QUAVER,45:Image.MUSIC_QUAVERS,46:Image.PITCHFORK,47:Image.XMAS,48:Image.PACMAN,49:Image.TARGET,50:Image.TSHIRT,51:Image.ROLLERSKATE,52:Image.DUCK,53:Image.HOUSE,54:Image.TORTOISE,55:Image.BUTTERFLY,56:Image.STICKFIGURE,57:Image.GHOST,58:Image.SWORD,59:Image.GIRAFFE,60:Image.SKULL,61:Image.UMBRELLA,62:Image.SNAKE,63:Image.HEART_SMALL}
+def map(a,x1,y1,x2,y2):return int((a-x1)*(y2-x2)/(y1-x1)+x2)
+def hi_nib(pb):return p[pb]>>4&15
+def lo_nib(pb):return p[pb]&15
+def get_nib(pb,nib):
+	if nib:return p[pb]&15
+	else:return p[pb]>>4&15
+def set_nib(pb,nib,v):
+	if nib:p[pb]=p[pb]&240|v
+	else:p[pb]=v<<4|p[pb]&15
 def save(fn):
-    try:
-        os.remove(fn)
-    except OSError:
-        writeln("rw error %s" % fn)
-    with open(fn, "wb") as mb:
-        mb.write(p)
-
+	try:os.remove(fn)
+	except OSError:writeln(RWE%fn)
+	with open(fn,'wb')as mb:mb.write(p)
 def load(fn):
-    try:
-        with open(fn, "rb") as mb:
-            mb.readinto(p)
-    except OSError:
-        writeln("rw error %s" % fn)
-
-def hi_nib(pb):
-    return (p[pb] >> 4) & 0x0F
-
-def lo_nib(pb):
-    return p[pb] & 0x0F
-
-def get_nib(pb, nib):
-    if nib:
-        return p[pb] & 0x0F
-    else:
-        return (p[pb] >> 4) & 0x0F
-
-def set_nib(pb, nib, v):
-    if nib:
-        p[pb] = (p[pb] & 0xF0) | v
-    else:
-        p[pb] = (v << 4) | (p[pb] & 0x0F)
-
+	try:
+		with open(fn,'rb')as mb:mb.readinto(p)
+	except OSError:writeln(RWE%fn)
 def hexToByte(c):
-    if (c >= "0") and (c <= "9"):
-        return ord(c) - ord("0")
-    if (c >= "A") and (c <= "F"):
-        return (ord(c) - ord("A")) + 10
-
+	if c>='0'and c<='9':return ord(c)-ord('0')
+	if c>='A'and c<='F':return ord(c)-ord('A')+10
 def nibbleToHex(value):
-    c = value & 0x0F
-    if (c >= 0) and (c <= 9):
-        return c + ord("0")
-    if (c >= 10) and (c <= 15):
-        return (c + ord("A")) - 10
-
-def printCheckSum(value):
-    checksum = value & 0xFF
-    checksum = (checksum ^ 0xFF) + 1
-    printHex8(checksum)
-    uart.write(CR)
-
-def printHex8(num):
-    tmp = bytearray(2)
-    tmp[0] = nibbleToHex(num >> 4)
-    tmp[1] = nibbleToHex(num)
-    uart.write(tmp)
-
-def printHex16(num):
-    printHex8(num>>8)
-    printHex8(num)
-
+	c=value&15
+	if c>=0 and c<=9:return c+ord('0')
+	if c>=10 and c<=15:return c+ord('A')-10
+def writeln(msg):uart.write(msg);uart.write(CR)
+def printCheckSum(value):checksum=value&255;checksum=(checksum^255)+1;printHex8(checksum);uart.write(CR)
+def printHex4(num):tmp=bytearray(1);tmp[0]=nibbleToHex(num);uart.write(tmp)
+def printHex8(num):tmp=bytearray(2);tmp[0]=nibbleToHex(num>>4);tmp[1]=nibbleToHex(num);uart.write(tmp)
+def printHex16(num):printHex8(num>>8);printHex8(num)
+def wh():writeln('waiting for command:');writeln('w: write HEX file, r: read file, e: end')
 def getNextChar():
-    while not uart.any():
-        sleep(10)
-    c = uart.read(1)
-    return chr(c[0])
-
+	while not uart.any():sleep(10)
+	c=uart.read(1);return chr(c[0])
 def getMidiNote(note):
-    if note >= 32 and note <= 108:
-        tune = music_note[note % 12] + chr(ord("2") + (int(note / 12))) + ":4"
-        return tune
-    return "C0:1"
-
-def tansAcc(value):
-    return map(value, -2000, 2000, 0, 256)
-
+	if note>=32 and note<=108:tune=music_note[note%12]+chr(ord('2')+int(note/12))+':4';return tune
+	return'C0:1'
+def tansAcc(value):return map(value,-2000,2000,0,256)
+def do(i,v):display.set_pixel(4-i,0,9*v);DO[i].write_digital(v)
+def sp(v):
+	for i in range(4):do(i,bool(v&1<<i))
+def si():
+	t=0
+	for i in range(4):t=t+(DI[i].read_digital()<<i)
+	return t
 def writeProgramSerial():
-    display.show(Image.ARROW_N)
-    writeln("program data:")
-    checksum = 0
-    for addr in range(E2E):
-        value = p[addr]
-        if (addr % 8) == 0:
-            if addr > 0:
-                printCheckSum(checksum)
-            checksum = 0
-            uart.write(":08")
-            checksum += 0x08
-            printHex16(addr)
-            checksum += addr >> 8
-            checksum += addr & 0x00FF
-            uart.write("00")
-        printHex8(value)
-        checksum += value
-    printCheckSum(checksum)
-    writeln(":00000001FF")
-
+	display.show(Image.ARROW_N);writeln('program data:');checksum=0
+	for pc in range(E2E):
+		value=p[pc]
+		if pc%8==0:
+			if pc>0:printCheckSum(checksum)
+			checksum=0;uart.write(':08');checksum+=8;printHex16(pc);checksum+=pc>>8;checksum+=pc&255;uart.write('00')
+		printHex8(value);checksum+=value
+	printCheckSum(checksum);writeln(':00000001FF')
 def serialprg():
-    display.show(Image.DIAMOND)
-    eOfp = False
-    uart.init(baudrate=9600)
-    uart.write(CR)
-    writeln(PN)
-    writeln("waiting for command:")
-    writeln("w: write HEX file, r: read file, e: end")
-    while not eOfp:
-        while uart.any():
-            c = uart.read(1)
-            ch = chr(c[0])
-            if ch == "w":
-                display.show(Image.ARROW_S)
-                writeln("ready")
-                eOfF = False
-                data = bytearray(32)
-                while True:
-                    for i in range(8):
-                        data[i] = 0xFF
-                    while True:
-                        c = getNextChar()
-                        if c == ":":
-                            break
-                    c = getNextChar()
-                    count = hexToByte(c) << 4
-                    c = getNextChar()
-                    count += hexToByte(c)
-                    crc = count
-                    c = getNextChar()
-                    readAddress = hexToByte(c) << 12
-                    c = getNextChar()
-                    readAddress += hexToByte(c) << 8
-                    c = getNextChar()
-                    readAddress += hexToByte(c) << 4
-                    c = getNextChar()
-                    readAddress += hexToByte(c)
-                    crc += readAddress >> 8
-                    crc += readAddress & 0x00FF
-                    c = getNextChar()
-                    type = hexToByte(c) << 4
-                    c = getNextChar()
-                    type += hexToByte(c)
-                    crc += type
-                    if type == 0x01:
-                        eOfF = True
-                    for x in range(count):
-                        c = getNextChar()
-                        value = hexToByte(c) << 4
-                        c = getNextChar()
-                        value += hexToByte(c)
-                        data[x] = value
-                        crc += value
-                    c = getNextChar()
-                    readcrc = hexToByte(c) << 4
-                    c = getNextChar()
-                    readcrc += hexToByte(c)
-                    crc += readcrc
-                    value = crc & 0x00FF
-                    if value == 0:
-                        uart.write("ok")
-                        for x in range(count):
-                            p[readAddress + x] = data[x]
-                    else:
-                        writeln(", CRC Error")
-                        eOfF = True
-                    writeln("")
-                    if eOfF:
-                        break
-                writeln("endOfFile")
-                save(TFN)
-            if ch == "r":
-                load(TFN)
-                writeProgramSerial()
-            if ch == "e":
-                writeln("end")
-                eOfp = True
-    display.clear()
-
+	display.show(Image.DIAMOND);eOfp=BF;uart.init(baudrate=9600);uart.write(CR);writeln(PN);wh()
+	while not eOfp:
+		while uart.any():
+			c=uart.read(1);ch=chr(c[0])
+			if ch=='w':
+				display.show(Image.ARROW_S);writeln('ready');eOfF=BF;data=bytearray(32)
+				while BT:
+					for i in range(8):data[i]=255
+					while BT:
+						c=getNextChar()
+						if c==':':break
+					c=getNextChar();count=hexToByte(c)<<4;c=getNextChar();count+=hexToByte(c);crc=count;c=getNextChar();readAddress=hexToByte(c)<<12;c=getNextChar();readAddress+=hexToByte(c)<<8;c=getNextChar();readAddress+=hexToByte(c)<<4;c=getNextChar();readAddress+=hexToByte(c);crc+=readAddress>>8;crc+=readAddress&255;c=getNextChar();type=hexToByte(c)<<4;c=getNextChar();type+=hexToByte(c);crc+=type
+					if type==1:eOfF=BT
+					for x in range(count):c=getNextChar();value=hexToByte(c)<<4;c=getNextChar();value+=hexToByte(c);data[x]=value;crc+=value
+					c=getNextChar();readcrc=hexToByte(c)<<4;c=getNextChar();readcrc+=hexToByte(c);crc+=readcrc;value=crc&255
+					if value==0:
+						uart.write('ok')
+						for x in range(count):p[readAddress+x]=data[x]
+					else:writeln(', CRC Error');eOfF=BT
+					writeln('')
+					if eOfF:break
+				writeln('endOfFile');save(TFN)
+			elif ch=='r':load(TFN);writeProgramSerial()
+			elif ch=='e':writeln('end');eOfp=BT
+			else: wh()
+	display.clear()
 def prg():
-    PC = 0
-    nib = 0
-    moved = 1
-    load(TFN)
-    for i in range(2):
-        for j in range(2):
-            for k in range(4):
-                if get_nib(i, j) & (1 << k):
-                    display.set_pixel(4 - k, i * 2 + j, 7 * bool(get_nib(i, j) & (1 << k)))
-    for i in range(4):
-        display.set_pixel(4 - i, nib % 4, 9)
-    while button_b.is_pressed():
-        pass
-    while True:
-        if button_a.is_pressed() and button_b.is_pressed():
-            save()
-            display.clear()
-            while button_a.is_pressed() and button_b.is_pressed():
-                pass
-            break
-        if button_a.is_pressed():
-            if moved:
-                moved = 0
-                set_nib(PC, nib % 2, 0x0F)
-            set_nib(PC, nib % 2, (get_nib(PC, nib % 2) + 1) % 16)
-            sleep(100)
-        if button_b.is_pressed():
-            moved = 1
-            nib = (nib + 1) % E2E
-            PC = nib >> 1
-            if nib % 4 == 0:
-                for i in range(2):
-                    for j in range(2):
-                        for k in range(4):
-                            display.set_pixel(
-                                4 - k,
-                                i * 2 + j,
-                                7 * bool(get_nib(PC + i, j) & (1 << k)),
-                            )
-            for i in range(4):
-                display.set_pixel(0, i, 5 * bool(PC & (1 << i)))
-            for i in range(4, 8):
-                display.set_pixel(4 - (i - 4), 4, 5 * bool(PC & (1 << i)))
-            for i in range(4):
-                display.set_pixel(4 - i, nib % 4, 9)
-            sleep(100)
-        for i in range(4):
-            display.set_pixel(4 - i, nib % 4, 7 * bool(get_nib(PC, nib % 2) & (1 << i)))
-        sleep(100)
-
+	PC=0;nib=0;moved=1;load(TFN)
+	for i in range(2):
+		for j in range(2):
+			for k in range(4):
+				if get_nib(i,j)&1<<k:display.set_pixel(4-k,i*2+j,7*bool(get_nib(i,j)&1<<k))
+	for i in range(4):display.set_pixel(4-i,nib%4,9)
+	while PRG.is_pressed():0
+	while BT:
+		if SEL.is_pressed()and PRG.is_pressed():
+			save();display.clear()
+			while SEL.is_pressed()and PRG.is_pressed():0
+			break
+		if SEL.is_pressed():
+			if moved:moved=0;set_nib(PC,nib%2,15)
+			set_nib(PC,nib%2,(get_nib(PC,nib%2)+1)%16);sleep(100)
+		if PRG.is_pressed():
+			moved=1;nib=(nib+1)%E2E;PC=nib>>1
+			if nib%4==0:
+				for i in range(2):
+					for j in range(2):
+						for k in range(4):display.set_pixel(4-k,i*2+j,7*bool(get_nib(PC+i,j)&1<<k))
+			for i in range(4):display.set_pixel(0,i,5*bool(PC&1<<i))
+			for i in range(4,8):display.set_pixel(4-(i-4),4,5*bool(PC&1<<i))
+			for i in range(4):display.set_pixel(4-i,nib%4,9)
+			sleep(100)
+		for i in range(4):display.set_pixel(4-i,nib%4,7*bool(get_nib(PC,nib%2)&1<<i))
+		sleep(100)
 def init():
-    for i in range(E2E):
-        p[i] = 0xFF
-    for i in range(4):
-        Din[i].set_pull(Din[i].PULL_UP)
-    for i in range(6):
-        subs[i] = 0
-
+	for i in range(E2E):p[i]=255
+	for i in range(4):DI[i].set_pull(DI[i].PULL_UP)
+	for i in range(6):SB[i]=0
 def run():
-    uart.init(baudrate=115200)
-    uart.write(CR)
-    writeln(PN + " running microbit TPS")
-
-    A = 0
-    B = 0
-    C = 0
-    D = 0
-    E = 0
-    F = 0
-    PC = 0
-    PAGE = 0
-    RET = 0
-    SKIP = 0
-    INST = 0
-    DATA = 0
-    stackp = 0
-    dbgtmp = bytearray(1)
-
-    load(TFN)
-    display.clear()
-
-    for i in range(E2E):
-        INST = hi_nib(i)
-        if INST == 0x0E:
-            DATA = lo_nib(i)
-            if DATA >= 0x08 and DATA <= 0x0D:
-                subs[DATA - 0x08] = i
-
-    while True:
-        INST = hi_nib(PC)
-        DATA = lo_nib(PC)
-
-        if DBG:
-            writeln("-")
-            uart.write("PC: ")
-            printHex16(PC)
-            writeln("")
-            uart.write("INST: ")
-            dbgtmp[0] = nibbleToHex(INST)
-            uart.write(dbgtmp)
-            uart.write(", DATA: ")
-            dbgtmp[0] = nibbleToHex(DATA)
-            uart.write(dbgtmp)
-            writeln("")
-            writeln("Register:")
-            uart.write("A: ")
-            printHex8(A)
-            uart.write(", B: ")
-            printHex8(B)
-            uart.write(", C: ")
-            printHex8(C)
-            writeln("")
-            uart.write("D: ")
-            printHex8(D)
-            uart.write(", E: ")
-            printHex8(E)
-            uart.write(", F: ")
-            printHex8(F)
-            writeln("")
-            uart.write("Page: ")
-            printHex8(PAGE)
-            uart.write(", Ret: ")
-            printHex16(RET)
-            writeln("")
-            if ST:
-                line = ""
-                while not line:
-                    line = uart.readline()
-        if INST == 0x00:
-            if DATA == 0x01:
-                display.set_pixel(A, B, 9)
-            elif DATA == 0x02:
-                display.set_pixel(A, B, 0)
-            elif DATA == 0x03:
-                if A == 0:
-                    display.clear()
-                else:
-                    image = images.get(A, Image.SAD)
-                    display.show(image)
-        elif INST == 0x01:
-            for i in range(4):
-                display.set_pixel(4 - i, 0, 9 * bool(DATA & (1 << i)))
-                Dout[i].write_digital(bool(DATA & (1 << i)))
-        elif INST == 0x02:
-            if DATA == 0x0E:
-                slp = 30000
-            elif DATA == 0x0F:
-                slp = 60000
-            else:
-                slp = (10 ** (DATA // 3)) * wait[DATA % 3]
-            sleep(slp)
-        elif INST == 0x03:
-            PC = PC - DATA
-            continue
-        elif INST == 0x04:
-            A = DATA
-        elif INST == 0x05:
-            if DATA == 0x00:
-                tmp = A
-                A = B
-                B = tmp
-            elif DATA == 0x01:
-                B = A
-            elif DATA == 0x02:
-                C = A
-            elif DATA == 0x03:
-                D = A
-            elif DATA == 0x04:
-                for i in range(4):
-                    display.set_pixel(4 - i, 0, 9 * bool(A & (1 << i)))
-                    Dout[i].write_digital(bool(A & (1 << i)))
-            elif DATA >= 0x05 and DATA <= 0x08:
-                display.set_pixel(9 - DATA, 0, 9 * (A & 0x01))
-                Dout[DATA - 5].write_digital(bool(A & 0x01))
-            elif DATA == 0x09:
-                Aout[0].set_analog_period(2)
-                Aout[0].write_analog(A%16 * 68)
-            elif DATA == 0x0A:
-                Aout[1].set_analog_period(2)
-                Aout[1].write_analog(A%16 * 68)
-            elif DATA == 0x0B:
-                Aout[0].set_analog_period(20)
-                Aout[0].write_analog(A%16 * 6)
-            elif DATA == 0x0C:
-                Aout[1].set_analog_period(20)
-                Aout[1].write_analog(A%16 * 6)
-            elif DATA == 0x0D:
-                E = A
-            elif DATA == 0x0E:
-                F = A
-            elif DATA == 0x0F:
-                stack[stackp] = A
-                stackp += 1
-                if stackp > 15:
-                    stackp = 15
-        elif INST == 0x06:
-            if DATA == 0x01:
-                A = B
-            elif DATA == 0x02:
-                A = C
-            elif DATA == 0x03:
-                A = D
-            elif DATA == 0x04:
-                A=Din[0].read_digital()|(Din[1].read_digital()<<1)|(Din[2].read_digital()<<2)|(Din[3].read_digital()<<3)
-            elif DATA >= 0x05 and DATA <= 0x08:
-                A = Din[DATA-0x05].read_digital()
-            elif DATA == 0x09:
-                display.off()
-                A = int(Ain[0].read_analog() / 64)
-                display.on()
-            elif DATA == 0x0A:
-                display.off()
-                A = int(Ain[1].read_analog() / 64)
-                display.on()
-            elif DATA == 0x0E:
-                A = E
-            elif DATA == 0x0E:
-                A = F
-            elif DATA == 0x0F:
-                stackp -= 1
-                if stackp < 0:
-                    stackp = 0
-                A = stack[stackp]
-        elif INST == 0x07:
-            if DATA == 0x01:
-                A = A + 1
-            elif DATA == 0x02:
-                A = A - 1
-            elif DATA == 0x03:
-                A = A + B
-            elif DATA == 0x04:
-                A = A - B
-            elif DATA == 0x05:
-                A = A * B
-            elif DATA == 0x06:
-                if B:
-                    A = A // B
-            elif DATA == 0x07:
-                A = A & B
-            elif DATA == 0x08:
-                A = A | B
-            elif DATA == 0x09:
-                A = A ^ B
-            elif DATA == 0x0A:
-                A = A ^ 0x0F
-            elif DATA == 0x0B:
-                A = A % B
-            elif DATA == 0x0C:
-                A = A + 16 * B
-            elif DATA == 0x0D:
-                A = B - A
-            elif DATA == 0x0E:
-                A = A >> 1
-            elif DATA == 0x0F:
-                A = A << 1
-        elif INST == 0x08:
-            PAGE = DATA * 16
-        elif INST == 0x09:
-            PC = PAGE + DATA
-            continue
-        elif INST == 0x0A:
-            if C > 0:
-                C = C - 1
-                PC = PAGE + DATA
-                continue
-        elif INST == 0x0B:
-            if D > 0:
-                D = D - 1
-                PC = PAGE + DATA
-                continue
-        elif INST == 0x0C:
-            if DATA == 0x00:
-                SKIP = A == 0
-            elif DATA == 0x01:
-                SKIP = A > B
-            elif DATA == 0x02:
-                SKIP = A < B
-            elif DATA == 0x03:
-                SKIP = A == B
-            elif DATA >= 0x04 and DATA <= 0x07:
-                SKIP = (Din[DATA % 4].read_digital()) & 0x01 == 1
-            elif DATA >= 0x08 and DATA <= 0x0B:
-                SKIP = (Din[DATA % 4].read_digital()) & 0x01 == 0
-            elif DATA >= 0x0C and DATA <= 0x0D:
-                SKIP = button[DATA - 0x0C].is_pressed()
-            elif DATA >= 0x0E:
-                SKIP = not button[DATA - 0x0E].is_pressed()
-            if SKIP:
-                PC = PC + 1
-        elif INST == 0x0D:
-            RET = PC + 1
-            PC = PAGE + DATA
-            continue
-        elif INST == 0x0E:
-            if DATA == 0x00:
-                PC = RET
-                continue
-            elif DATA >= 0x01 and DATA <= 0x06:
-                RET = PC
-                PC = subs[DATA - 0x01]
-                continue
-            elif DATA == 0x0F:
-                reset()
-        elif INST == 0x0F:
-            if DATA == 0x00:
-                display.off()
-                A = int(Ain[0].read_analog() >> 2)
-                display.on()
-            elif DATA == 0x01:
-                display.off()
-                A = int(Ain[1].read_analog() >> 2)
-                display.on()
-            elif DATA == 0x04:
-                Aout[0].set_analog_period(2)
-                Aout[0].write_analog(A << 4)
-            elif DATA == 0x05:
-                Aout[1].set_analog_period(2)
-                Aout[1].write_analog(A << 4)
-            elif DATA == 0x06:
-                Aout[0].set_analog_period(20)
-                Aout[0].write_analog(int(A / 2))
-            elif DATA == 0x07:
-                Aout[1].set_analog_period(20)
-                Aout[1].write_analog(int(A / 2))
-            elif DATA == 0x08:
-                music.play(getMidiNote(A))
-            elif DATA == 0x09:
-                # get accel
-                A = tansAcc(accelerometer.get_x())
-                E = tansAcc(accelerometer.get_y())
-                F = tansAcc(accelerometer.get_z())
-            elif DATA == 0x0A:
-                if not compass.is_calibrated:
-                    compass.calibrate()
-                A = int(compass.heading() / 5)
-            elif DATA == 0x0B:
-                mic_val = int((microphone.sound_level() / 255) * 16)
-                A = mic_val
-            elif DATA == 0x0C:
-                A = display.read_light_level()
-            elif DATA == 0x0D:
-                A = pin_logo.is_touched()
-        A = A & 0xFF
-        B = B & 0xFF
-        C = C & 0xFF
-        D = D & 0xFF
-        E = E & 0xFF
-        F = F & 0xFF
-        PC = (PC + 1) % E2E
-
+	uart.init(baudrate=115200);uart.write(CR);writeln(PN+' running microbit TPS')
+	A=0;B=0;C=0;D=0;E=0;F=0;PC=0;PG=0;RT=0;IN=0;DT=0;STP=0;load(TFN);display.clear()
+	for i in range(E2E):
+		IN=hi_nib(i)
+		if IN==14:
+			DT=lo_nib(i)
+			if DT>=8 and DT<=13:SB[DT-8]=i
+	while BT:
+		IN=p[PC]>>4;DT=p[PC]&15
+		if DBG:
+			writeln('-');uart.write('PC: ');printHex16(PC);writeln('');uart.write('INST: ');printHex4(IN);uart.write(', DATA: ');printHex4(DT);writeln('');writeln('Register:');uart.write('A: ');printHex8(A);uart.write(', B: ');printHex8(B);uart.write(', C: ');printHex8(C);writeln('');uart.write('D: ');printHex8(D);uart.write(', E: ');printHex8(E);uart.write(', F: ');printHex8(F);writeln('');uart.write('Page: ');printHex8(PG);uart.write(', Ret: ');printHex16(RT);writeln('')
+			if ST:
+				line=''
+				while not line:line=uart.readline()
+		if IN==0:
+			if DT==1:display.set_pixel(A,B,9)
+			if DT==2:display.set_pixel(A,B,0)
+			if DT==3:
+				if A==0:display.clear()
+				else:image=images.get(A,Image.SAD);display.show(image)
+		if IN==1:sp(DT)
+		if IN==2:
+			if DT==14:slp=30000
+			if DT==15:slp=60000
+			else:slp=10**(DT//3)*WT[DT%3]
+			sleep(slp)
+		if IN==3:PC=PC-DT-1
+		if IN==4:A=DT
+		if IN==5:
+			if DT==0:tmp=A;A=B;B=tmp
+			if DT==1:B=A
+			if DT==2:C=A
+			if DT==3:D=A
+			if DT==4:sp(A)
+			if DT>4 and DT<=8:do(DT-5,A&1)
+			if DT>8 and DT<=10:AO[DT-9].set_analog_period(2);AO[DT-9].write_analog((A&15)*64)
+			if DT>10 and DT<=12:AO[DT-11].set_analog_period(20);AO[DT-9].write_analog((A&15)*64)
+			if DT==13:E=A
+			if DT==14:F=A
+			if DT==15:
+				STK[STP]=A;STP+=1
+				if STP>15:STP=15
+		if IN==6:
+			if DT==1:A=B
+			if DT==2:A=C
+			if DT==3:A=D
+			if DT==4:A=si()
+			if DT>4 and DT<=8:A=DI[DT-5].read_digital()
+			if DT>8 and DT<=10:display.off();A=AI[DT-9].read_analog()//64;display.on()
+			if DT==13:A=E
+			if DT==14:A=F
+			if DT==15:
+				STP-=1
+				if STP<0:STP=0
+				A=STK[STP]
+		if IN==7:
+			if DT==1:A=A+1
+			if DT==2:A=A-1
+			if DT==3:A=A+B
+			if DT==4:A=A-B
+			if DT==5:A=A*B
+			if DT==6:
+				if B:A=A//B
+			if DT==7:A=A&B
+			if DT==8:A=A|B
+			if DT==9:A=A^B
+			if DT==10:A=~A
+			if DT==11:A=A%B
+			if DT==12:A=A+16*B
+			if DT==13:A=B-A
+			if DT==14:A=A>>1
+			if DT==15:A=A<<1
+		if IN==8:PG=DT*16
+		if IN==9:PC=PG+DT;continue
+		if IN==10:
+			if C>0:C=C-1;PC=PG+DT;continue
+		if IN==11:
+			if D>0:D=D-1;PC=PG+DT;continue
+		if IN==12:
+			s=BF
+			if DT==0:s=A==0
+			if DT==1:s=A>B
+			if DT==2:s=A<B
+			if DT==3:s=A==B
+			if DT>=4 and DT<=7:s=DI[DT%4].read_digital()&1==1
+			if DT>=8 and DT<=11:s=DI[DT%4].read_digital()&1==0
+			if DT==12:s=PRG.is_pressed()
+			if DT==13:s=SEL.is_pressed()
+			if DT==14:s=not PRG.is_pressed()
+			if DT==15:s=not SEL.is_pressed()
+			if s:PC=PC+1
+		if IN==13:RT=PC+1;PC=PG+DT;continue
+		if IN==14:
+			if DT==0:PC=RT-1
+			if DT>=1 and DT<=6:RT=PC;PC=SB[DT-1];continue
+			if DT==15:reset()
+		if IN==15:
+			if DT==0:display.off();A=int(AI[0].read_analog()>>2);display.on()
+			if DT==1:display.off();A=int(AI[1].read_analog()>>2);display.on()
+			if DT==4:AO[0].set_analog_period(2);AO[0].write_analog(A<<4)
+			if DT==5:AO[1].set_analog_period(2);AO[1].write_analog(A<<4)
+			if DT==6:AO[0].set_analog_period(20);AO[0].write_analog(int(A/2))
+			if DT==7:AO[1].set_analog_period(20);AO[1].write_analog(int(A/2))
+			if DT==8:music.play(getMidiNote(A))
+			if DT==9:A=tansAcc(accelerometer.get_x());E=tansAcc(accelerometer.get_y());F=tansAcc(accelerometer.get_z())
+			if DT==10:
+				if not compass.is_calibrated:compass.calibrate()
+				A=int(compass.heading()/5)
+			if DT==11:mic_val=int(microphone.sound_level()/255*16);A=mic_val
+			if DT==12:A=display.read_light_level()
+			if DT==13:A=pin_logo.is_touched()
+			if DT==15:PC=0;continue
+		A=A&255;B=B&255;C=C&255;D=D&255;E=E&255;F=F&255;PC=(PC+1)%E2E
 init()
-if button_b.is_pressed():
-    prg()
-if button_a.is_pressed():
-    serialprg()
+if PRG.is_pressed():prg()
+if SEL.is_pressed():serialprg()
 run()
