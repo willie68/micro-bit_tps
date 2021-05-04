@@ -66,6 +66,7 @@ def sp(v):
 def si():
 	t=0
 	for i in range(4):t=t+(DI[i].read_digital()<<i)
+	sh(t, 1)
 	return t
 def writeProgramSerial():
 	display.show(Image.ARROW_N);writeln('program data:');checksum=0
@@ -103,34 +104,35 @@ def serialprg():
 			elif ch=='e':writeln('end');eOfp=BT
 			else: wh()
 	display.clear()
-def prg():
-	PC=0;nib=0;moved=1;load(TFN)
-	for i in range(2):
-		for j in range(2):
-			for k in range(4):
-				if get_nib(i,j)&1<<k:display.set_pixel(4-k,i*2+j,7*bool(get_nib(i,j)&1<<k))
-	for i in range(4):display.set_pixel(4-i,nib%4,9)
+def sh(v,r):
+	for i in range(4):display.set_pixel(4-i,r,9*(v>>i&1))
+def wp():
 	while PRG.is_pressed():0
-	while BT:
-		if SEL.is_pressed()and PRG.is_pressed():
-			save();display.clear()
-			while SEL.is_pressed()and PRG.is_pressed():0
-			break
-		if SEL.is_pressed():
-			if moved:moved=0;set_nib(PC,nib%2,15)
-			set_nib(PC,nib%2,(get_nib(PC,nib%2)+1)%16);sleep(100)
-		if PRG.is_pressed():
-			moved=1;nib=(nib+1)%E2E;PC=nib>>1
-			if nib%4==0:
-				for i in range(2):
-					for j in range(2):
-						for k in range(4):display.set_pixel(4-k,i*2+j,7*bool(get_nib(PC+i,j)&1<<k))
-			for i in range(4):display.set_pixel(0,i,5*bool(PC&1<<i))
-			for i in range(4,8):display.set_pixel(4-(i-4),4,5*bool(PC&1<<i))
-			for i in range(4):display.set_pixel(4-i,nib%4,9)
+def prg():
+	load(TFN);display.show(Image.TSHIRT);wp();display.clear();PC=0;PM=BT
+	while PM:
+		IN=p[PC]>>4;DT=p[PC]&15;sh(IN,0);sh(DT,1);sh(PC,4);sh(PC>>4,3);display.set_pixel(0,0,5);display.set_pixel(0,1,0);ED=BT
+		while ED:
+			while not(PRG.is_pressed()or SEL.is_pressed()):0
 			sleep(100)
-		for i in range(4):display.set_pixel(4-i,nib%4,7*bool(get_nib(PC,nib%2)&1<<i))
-		sleep(100)
+			if PRG.is_pressed()and SEL.is_pressed():PM=BF;break
+			if SEL.is_pressed():
+				while SEL.is_pressed():IN=IN+1&15;p[PC]=(IN<<4)+DT;sh(IN,0);sleep(250)
+				continue
+			ED=BF
+		if not PM:break
+		display.set_pixel(0,0,0);display.set_pixel(0,1,5);wp();ED=BT
+		while ED:
+			while not(PRG.is_pressed()or SEL.is_pressed()):0
+			sleep(100)
+			if PRG.is_pressed()and SEL.is_pressed():PM=BF;break
+			if SEL.is_pressed():
+				while SEL.is_pressed():DT=DT+1&15;p[PC]=(IN<<4)+DT;sh(DT,1);sleep(250)
+				continue
+			ED=BF
+		wp();sleep(100);PC=PC+1
+		if PC>=E2E:break
+	display.show(Image.YES);save(TFN);sleep(1000)
 def init():
 	for i in range(E2E):p[i]=255
 	for i in range(4):DI[i].set_pull(DI[i].PULL_UP)
