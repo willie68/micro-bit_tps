@@ -57,7 +57,7 @@ def getNextChar():
 	while not uart.any():sleep(10)
 	c=uart.read(1);return chr(c[0])
 def getMidiNote(note):
-	if note>=32 and note<=108:tune=music_note[note%12]+chr(ord('2')+int(note/12))+':4';return tune
+	if note>=32 and note<=108:tune=music_note[note%12]+chr(ord('2')+int(note/12))+':32';return tune
 	return'C0:1'
 def tansAcc(value):return map(value,-2000,2000,0,256)
 def do(i,v):display.set_pixel(4-i,0,9*v);DO[i].write_digital(v)
@@ -138,7 +138,7 @@ def init():
 	for i in range(4):DI[i].set_pull(DI[i].PULL_UP)
 	for i in range(6):SB[i]=0
 def run():
-	uart.init(baudrate=115200);uart.write(CR);writeln(PN+' running microbit TPS')
+	uart.init(baudrate=115200);uart.write(CR);writeln(PN+'\r\nrunning microbit TPS')
 	A=0;B=0;C=0;D=0;E=0;F=0;PC=0;PG=0;RT=0;IN=0;DT=0;STP=0;load(TFN);display.clear()
 	for i in range(E2E):
 		IN=hi_nib(i)
@@ -241,7 +241,9 @@ def run():
 			if DT==5:AO[1].set_analog_period(2);AO[1].write_analog(A<<4)
 			if DT==6:AO[0].set_analog_period(20);AO[0].write_analog(int(A/2))
 			if DT==7:AO[1].set_analog_period(20);AO[1].write_analog(int(A/2))
-			if DT==8:music.play(getMidiNote(A))
+			if DT==8:
+			    if A==0: music.pitch(0,duration=1,wait=BF)
+			    if A>0:f=440*(2**((A-69)/12));music.pitch(int(f),duration=-1,wait=BF)
 			if DT==9:A=tansAcc(accelerometer.get_x());E=tansAcc(accelerometer.get_y());F=tansAcc(accelerometer.get_z())
 			if DT==10:
 				if not compass.is_calibrated:compass.calibrate()
