@@ -34,11 +34,11 @@ The actual command implementation list for the micro:bit V2:
 
 new commands for the micro:bit
 
-SetPixel: sets a pixel directly with x,y coordinates. X=A Y=B
+**SetPixel**: sets a pixel directly with x,y coordinates. X=A Y=B
 
-ClearPixel: clears a pixel 
+**ClearPixel**: clears a pixel 
 
-ShowImage(image): if image is set to 0, the display is cleared, otherwise it will set a nice image on the display. 
+**ShowImage**(image): if image is set to 0, the display is cleared, otherwise it will set a nice image on the display.  Number to image, see appendix.
 
 |      | 8           | 9                              | a                                                     | b                                                    | c                 | d                         | e              | f                                     |
 | ---- | ----------- | ------------------------------ | ----------------------------------------------------- | ---------------------------------------------------- | ----------------- | ------------------------- | -------------- | ------------------------------------- |
