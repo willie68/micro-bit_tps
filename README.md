@@ -4,6 +4,10 @@ This is my implementation of the TPS. The instructions will be compatible to my 
 
 If you find a bug, feel free to create a issue in the tracker. 
 
+# Installation
+
+To install the micro: bit TPS version, please simply copy the file microbit_tps.hex to the micro: bit drive.
+
 # Command implementation Chart
 
 The actual command implementation list for the micro:bit V2: 
