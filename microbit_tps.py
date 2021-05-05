@@ -4,7 +4,7 @@ import music,gc,os
 gc.collect()
 BT=True
 BF=False
-DBG=BF
+DBG=BT
 ST=BF
 PN='micro:bit v2'
 CR='\r\n'
@@ -66,8 +66,7 @@ def sp(v):
 def si():
 	t=0
 	for i in range(4):t=t+(DI[i].read_digital()<<i)
-	sh(t, 1)
-	return t
+	sh(t,1);return t
 def writeProgramSerial():
 	display.show(Image.ARROW_N);writeln('program data:');checksum=0
 	for pc in range(E2E):
@@ -102,7 +101,7 @@ def serialprg():
 				writeln('endOfFile');save(TFN)
 			elif ch=='r':load(TFN);writeProgramSerial()
 			elif ch=='e':writeln('end');eOfp=BT
-			else: wh()
+			else:wh()
 	display.clear()
 def sh(v,r):
 	for i in range(4):display.set_pixel(4-i,r,9*(v>>i&1))
@@ -138,8 +137,7 @@ def init():
 	for i in range(4):DI[i].set_pull(DI[i].PULL_UP)
 	for i in range(6):SB[i]=0
 def run():
-	uart.init(baudrate=115200);uart.write(CR);writeln(PN+'\r\nrunning microbit TPS')
-	A=0;B=0;C=0;D=0;E=0;F=0;PC=0;PG=0;RT=0;IN=0;DT=0;STP=0;load(TFN);display.clear()
+	uart.init(baudrate=115200);uart.write(CR);writeln(PN+'\r\nrunning microbit TPS');A=0;B=0;C=0;D=0;E=0;F=0;PC=0;PG=0;RT=0;IN=0;DT=0;STP=0;load(TFN);display.clear()
 	for i in range(E2E):
 		IN=hi_nib(i)
 		if IN==14:
@@ -204,7 +202,7 @@ def run():
 			if DT==7:A=A&B
 			if DT==8:A=A|B
 			if DT==9:A=A^B
-			if DT==10:A=~A
+			if DT==10:A=~ A
 			if DT==11:A=A%B
 			if DT==12:A=A+16*B
 			if DT==13:A=B-A
@@ -242,8 +240,8 @@ def run():
 			if DT==6:AO[0].set_analog_period(20);AO[0].write_analog(int(A/2))
 			if DT==7:AO[1].set_analog_period(20);AO[1].write_analog(int(A/2))
 			if DT==8:
-			    if A==0: music.pitch(0,duration=1,wait=BF)
-			    if A>0:f=440*(2**((A-69)/12));music.pitch(int(f),duration=-1,wait=BF)
+				if A==0:music.pitch(0,duration=1,wait=BF)
+				if A>0:f=440*2**((A-69)/12);music.pitch(int(f),duration=-1,wait=BF)
 			if DT==9:A=tansAcc(accelerometer.get_x());E=tansAcc(accelerometer.get_y());F=tansAcc(accelerometer.get_z())
 			if DT==10:
 				if not compass.is_calibrated:compass.calibrate()
@@ -251,9 +249,23 @@ def run():
 			if DT==11:mic_val=int(microphone.sound_level()/255*16);A=mic_val
 			if DT==12:A=display.read_light_level()
 			if DT==13:A=pin_logo.is_touched()
+			if DT==14:
+				g=accelerometer.current_gesture();A=0
+				if g=='up':A=1
+				if g=='down':A=2
+				if g=='left':A=3
+				if g=='right':A=4
+				if g=='face up':A=5
+				if g=='face down':A=6
+				if g=='freefall':A=7
+				if g=='3g':A=8
+				if g=='6g':A=9
+				if g=='8g':A=10
+				if g=='shake':A=11
 			if DT==15:PC=0;continue
 		A=A&255;B=B&255;C=C&255;D=D&255;E=E&255;F=F&255;PC=(PC+1)%E2E
 init()
 if PRG.is_pressed():prg()
 if SEL.is_pressed():serialprg()
+DBG=pin_logo.is_touched()
 run()

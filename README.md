@@ -6,7 +6,7 @@ If you find a bug, feel free to create a issue in the tracker.
 
 # Command implementation Chart
 
-The actual command implementation list for the microbit V2: 
+The actual command implementation list for the micro:bit V2: 
 
 |      | 0                                        | 1           | 2            | 3                         | 4         | 5                | 6            | 7                     |
 | ---- | ---------------------------------------- | ----------- | ------------ | ------------------------- | --------- | ---------------- | ------------ | --------------------- |
@@ -28,7 +28,7 @@ The actual command implementation list for the microbit V2:
 | e    |                                          | 14          | 30s          | 14                        | 14        | F=A [MOV]        | A=F [MOV]    | A=A SHR 1 [SHR]       |
 | f    |                                          | 15          | 60s          | 15                        | 15        | Push A [PUSH]    | Pop A [POP]  | A=A SHL 1 [SHL]       |
 
-new commands for the microbit
+new commands for the micro:bit
 
 SetPixel: sets a pixel directly with x,y coordinates. X=A Y=B
 
@@ -53,77 +53,85 @@ ShowImage(image): if image is set to 0, the display is cleared, otherwise it wil
 | b    | 11          | 11                             | 11                                                    | 11                                                   | Din.4==0 [DEQ0 4] | 11                        | 4 [DFSB]       | A=SoundLevel()                        |
 | c    | 12          | 12                             | 12                                                    | 12                                                   | S_PRG==0 [PRG0]   | 12                        | 5 [DFSB]       | A=LightLevel (0..255)                 |
 | d    | 13          | 13                             | 13                                                    | 13                                                   | S_SEL==0 [SEL0]   | 13                        | 6 [DFSB]       | A=LogoTouched                         |
-| e    | 14          | 14                             | 14                                                    | 14                                                   | S_PRG==1 [PRG1]   | 14                        |                |                                       |
+| e    | 14          | 14                             | 14                                                    | 14                                                   | S_PRG==1 [PRG1]   | 14                        |                | A=Gesture()                           |
 | f    | 15          | 15                             | 15                                                    | 15                                                   | S_SEL==1 [SEL1]   | 15                        | restart [REST] | PrgEnd [PEND]                         |
 
-new commands for the microbit
+new commands for the micro:bit
 
-GetACC: get values from the accelerator, A will be the x-axis, E the y-axis, and F the z-axis all Values range form 0..255
+**GetACC**: get values from the accelerator, A will be the x-axis, E the y-axis, and F the z-axis all Values range form 0..255
 
-Compass: get the value of the compass, the value is in 5° Steps, so 0 = 0° 1 = 5°, 2=10°...
+**Compass**: get the value of the compass, the value is in 5° Steps, so 0 = 0° 1 = 5°, 2=10°...
 
-SoundLevel: level of the microfon
+**SoundLevel**: level of the microfon
 
-LightLevel: level of the ambiant light
+**LightLevel**: level of the ambiant light
 
-LogoTouched: the logo was touched.
+**Gesture**: is the gesture you where making with the micro:bit. The following gestures will be detected:
+
+| No.  | Gesture      | No.  | Gesture   |
+| ---- | ------------ | ---- | --------- |
+| 0    | nothing      | 6    | face down |
+| 1    | moving up    | 7    | freefall  |
+| 2    | moving down  | 8    | 3g        |
+| 3    | moving left  | 9    | 6g        |
+| 4    | moving right | 10   | 8g        |
+| 5    | face up      | 11   | shake     |
+
+**LogoTouched**: the logo is touched.
 
 ## Hardware assignments:
 
 **Caution**: Due to the dual assignment of pins (especially the two A / D converters) can cause effects on the circuit in both directions. Protective diodes may be required there.
 
- Button A is PRG or S1 (pin5)
- Button B is SEL or S2 (pin11)
- output pins 
-   1 pin0
-   2 pin1
-   3 pin2
-   4 pin12
- input pins
-   1 pin13
-   2 pin14
-   3 pin15
-   4 pin16
-  a/d pins
-   1 pin3
-   2 pin 4
-  d/a pins
-   1 pin8
-   2 pin9
-  servo pins
-   1 pin8
-   2 pin9
-  ppm in pins
-    not implemented yet
-	
+Button A is PRG or S1 (pin 5)
+Button B is SEL or S2 (pin 11)
+servo pins: Servo 1: pin 8, Servo 2: pin 9
+ppm pins: not implemented yet
 
-## Microbit pin Mapping
-
- 
-
-| pin number | microbit function | TPS function |
-| ---------- | ----------------- | ------------ |
-| 0          | a/d               | DOut.1       |
-| 1          | a/d               | DOut.2       |
-| 2          | a/d               | DOut.3       |
-| 3          | LED Col 3 a/d     | A/D 1        |
-| 4          | LED Col 1 a/d     | A/D 2        |
-| 5          | Button A          | PRG/S1       |
-| 6          | LED Col 4         | unusable     |
-| 7          | LED Col 2         | unusable     |
-| 8          |                   | D/A 1        |
-| 9          |                   | D/A 2        |
-| 10         | LED Col 5 a/d     | unusable     |
-| 11         | Button B          | SEL/S2       |
-| 12         | reserved          | DOut.4       |
-| 13         |                   | DIn.1        |
-| 14         |                   | DIn.2        |
-| 15         |                   | DIn.3        |
-| 16         |                   | DIn.4        |
-| 19         | I2C               | unusable     |
-| 20         | I2C               | unusable     |
+## Micro:bit pin mapping table
 
 
+
+| pin number | micro:bit function | TPS function |
+| ---------- | ------------------ | ------------ |
+| 0          | a/d                | DOut.1       |
+| 1          | a/d                | DOut.2       |
+| 2          | a/d                | DOut.3       |
+| 3          | LED Col 3 a/d      | A/D 1        |
+| 4          | LED Col 1 a/d      | A/D 2        |
+| 5          | Button A           | PRG/S1       |
+| 6          | LED Col 4          | unusable     |
+| 7          | LED Col 2          | unusable     |
+| 8          |                    | D/A 1        |
+| 9          |                    | D/A 2        |
+| 10         | LED Col 5 a/d      | unusable     |
+| 11         | Button B           | SEL/S2       |
+| 12         | reserved           | DOut.4       |
+| 13         |                    | DIn.1        |
+| 14         |                    | DIn.2        |
+| 15         |                    | DIn.3        |
+| 16         |                    | DIn.4        |
+| 19         | I2C                | unusable     |
+| 20         | I2C                | unusable     |
+
+# Debug mode
+
+This micro: bit TPS version supports debug and single step mode. In debug mode, additional information is made available on the serial interface while the program is being executed. A terminal program (such as hterm: https://www.der-hammer.info/pages/terminal.html) is required for this. Settings: 115200 baud 8N1.
+
+```
+-
+PC: 0000
+INST: 1, DATA: 1
+Register:
+A: 00, B: 00, C: 00
+D: 00, E: 00, F: 00
+Page: 00, Ret: 0000
+```
+
+PC is the program counter. INST and DATA are the nibbles of the command. The current status of the registers is shown under Register. PAGE is the page register and RET contains the return address for a subroutine call (via command 0xD #).
+While the single step mode can only be set via source code, the pure debug mode can be started by touching the logo during a reset.
+
+# Apendix
 
 ## Image List:
 
