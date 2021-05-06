@@ -34,11 +34,11 @@ The actual command implementation list for the micro:bit V2:
 
 new commands for the micro:bit
 
-SetPixel: sets a pixel directly with x,y coordinates. X=A Y=B
+**SetPixel**: sets a pixel directly with x,y coordinates. X=A Y=B
 
-ClearPixel: clears a pixel 
+**ClearPixel**: clears a pixel 
 
-ShowImage(image): if image is set to 0, the display is cleared, otherwise it will set a nice image on the display. 
+**ShowImage**(image): if image is set to 0, the display is cleared, otherwise it will set a nice image on the display.  Number to image, see appendix.
 
 |      | 8           | 9                              | a                                                     | b                                                    | c                 | d                         | e              | f                                     |
 | ---- | ----------- | ------------------------------ | ----------------------------------------------------- | ---------------------------------------------------- | ----------------- | ------------------------- | -------------- | ------------------------------------- |
@@ -66,9 +66,9 @@ new commands for the micro:bit
 
 **Compass**: get the value of the compass, the value is in 5° Steps, so 0 = 0° 1 = 5°, 2=10°...
 
-**SoundLevel**: level of the microfon
+**SoundLevel**: level of the microphone
 
-**LightLevel**: level of the ambiant light
+**LightLevel**: level of the ambient light
 
 **Gesture**: is the gesture you where making with the micro:bit. The following gestures will be detected:
 
@@ -90,33 +90,33 @@ new commands for the micro:bit
 Button A is PRG or S1 (pin 5)
 Button B is SEL or S2 (pin 11)
 servo pins: Servo 1: pin 8, Servo 2: pin 9
-ppm pins: not implemented yet
+ppm pins: pin 3, pin 4
 
 ## Micro:bit pin mapping table
 
 
 
-| pin number | micro:bit function | TPS function |
-| ---------- | ------------------ | ------------ |
-| 0          | a/d                | DOut.1       |
-| 1          | a/d                | DOut.2       |
-| 2          | a/d                | DOut.3       |
-| 3          | LED Col 3 a/d      | A/D 1        |
-| 4          | LED Col 1 a/d      | A/D 2        |
-| 5          | Button A           | PRG/S1       |
-| 6          | LED Col 4          | unusable     |
-| 7          | LED Col 2          | unusable     |
-| 8          |                    | D/A 1        |
-| 9          |                    | D/A 2        |
-| 10         | LED Col 5 a/d      | unusable     |
-| 11         | Button B           | SEL/S2       |
-| 12         | reserved           | DOut.4       |
-| 13         |                    | DIn.1        |
-| 14         |                    | DIn.2        |
-| 15         |                    | DIn.3        |
-| 16         |                    | DIn.4        |
-| 19         | I2C                | unusable     |
-| 20         | I2C                | unusable     |
+| pin number | micro:bit function | TPS function  |
+| ---------- | ------------------ | ------------- |
+| 0          | a/d                | DOut.1        |
+| 1          | a/d                | DOut.2        |
+| 2          | a/d                | DOut.3        |
+| 3          | LED Col 3 a/d      | A/D 1, RCin 1 |
+| 4          | LED Col 1 a/d      | A/D 2, RCin 2 |
+| 5          | Button A           | PRG/S1        |
+| 6          | LED Col 4          | unusable      |
+| 7          | LED Col 2          | unusable      |
+| 8          |                    | D/A 1         |
+| 9          |                    | D/A 2         |
+| 10         | LED Col 5 a/d      | unusable      |
+| 11         | Button B           | SEL/S2        |
+| 12         | reserved           | DOut.4        |
+| 13         |                    | DIn.1         |
+| 14         |                    | DIn.2         |
+| 15         |                    | DIn.3         |
+| 16         |                    | DIn.4         |
+| 19         | I2C                | unusable      |
+| 20         | I2C                | unusable      |
 
 # Debug mode
 

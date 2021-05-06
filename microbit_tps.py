@@ -1,6 +1,6 @@
 RWE='rw error %s'
 from microbit import *
-import music,gc,os
+import machine,music,gc,os
 gc.collect()
 BT=True
 BF=False
@@ -60,6 +60,11 @@ def getMidiNote(note):
 	if note>=32 and note<=108:tune=music_note[note%12]+chr(ord('2')+int(note/12))+':32';return tune
 	return'C0:1'
 def tansAcc(value):return map(value,-2000,2000,0,256)
+def rci(p):
+    t=int(machine.time_pulse_us(p,1,40000))
+    if t<1000: return 0
+    if t>2000: return 255
+    return map(t,1000,2000,0,256)
 def do(i,v):display.set_pixel(4-i,0,9*v);DO[i].write_digital(v)
 def sp(v):
 	for i in range(4):do(i,bool(v&1<<i))
@@ -185,6 +190,8 @@ def run():
 			if DT==4:A=si()
 			if DT>4 and DT<=8:A=DI[DT-5].read_digital()
 			if DT>8 and DT<=10:display.off();A=AI[DT-9].read_analog()//64;display.on()
+			if DT==11:display.off();A=rci(AI[0])>>4;display.on()
+			if DT==12:display.off();A=rci(AI[1])>>4;display.on()
 			if DT==13:A=E
 			if DT==14:A=F
 			if DT==15:
@@ -235,6 +242,8 @@ def run():
 		if IN==15:
 			if DT==0:display.off();A=int(AI[0].read_analog()>>2);display.on()
 			if DT==1:display.off();A=int(AI[1].read_analog()>>2);display.on()
+			if DT==2:display.off();A=rci(AI[0]);display.on()
+			if DT==3:display.off();A=rci(AI[1]);display.on()
 			if DT==4:AO[0].set_analog_period(2);AO[0].write_analog(A<<4)
 			if DT==5:AO[1].set_analog_period(2);AO[1].write_analog(A<<4)
 			if DT==6:AO[0].set_analog_period(20);AO[0].write_analog(int(A/2))
