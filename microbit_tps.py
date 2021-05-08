@@ -115,22 +115,24 @@ def wp():
 def prg():
 	load(TFN);display.show(Image.TSHIRT);wp();display.clear();PC=0;PM=BT
 	while PM:
-		IN=p[PC]>>4;DT=p[PC]&15;sh(IN,0);sh(DT,1);sh(PC,4);sh(PC>>4,3);display.set_pixel(0,0,5);display.set_pixel(0,1,0);ED=BT
+		IN=p[PC]>>4;DT=p[PC]&15;sh(IN,0);sh(DT,1);sh(PC,4);sh(PC>>4,3);display.set_pixel(0,0,5);display.set_pixel(0,1,0);ED=BT;NE=BT
 		while ED:
 			while not(PRG.is_pressed()or SEL.is_pressed()):0
 			sleep(100)
 			if PRG.is_pressed()and SEL.is_pressed():PM=BF;break
 			if SEL.is_pressed():
+				if NE:NE=BF;IN=-1
 				while SEL.is_pressed():IN=IN+1&15;p[PC]=(IN<<4)+DT;sh(IN,0);sleep(250)
 				continue
 			ED=BF
 		if not PM:break
-		display.set_pixel(0,0,0);display.set_pixel(0,1,5);wp();ED=BT
+		display.set_pixel(0,0,0);display.set_pixel(0,1,5);wp();ED=BT;NE=BT
 		while ED:
 			while not(PRG.is_pressed()or SEL.is_pressed()):0
 			sleep(100)
 			if PRG.is_pressed()and SEL.is_pressed():PM=BF;break
 			if SEL.is_pressed():
+				if NE:NE=BF;DT=-1
 				while SEL.is_pressed():DT=DT+1&15;p[PC]=(IN<<4)+DT;sh(DT,1);sleep(250)
 				continue
 			ED=BF
