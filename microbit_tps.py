@@ -2,6 +2,7 @@ RWE='rw error %s'
 from microbit import *
 import machine,music,gc,os
 gc.collect()
+BR=115200
 BT=True
 BF=False
 DBG=BT
@@ -81,8 +82,8 @@ def writeProgramSerial():
 			checksum=0;uart.write(':08');checksum+=8;printHex16(pc);checksum+=pc>>8;checksum+=pc&255;uart.write('00')
 		printHex8(value);checksum+=value
 	printCheckSum(checksum);writeln(':00000001FF')
-def serialprg():
-	display.show(Image.DIAMOND);eOfp=BF;uart.init(baudrate=9600);uart.write(CR);writeln(PN);wh()
+def serialprg(br):
+	display.show(Image.DIAMOND);eOfp=BF;uart.init(baudrate=br);uart.write(CR);writeln(PN);wh()
 	while not eOfp:
 		while uart.any():
 			c=uart.read(1);ch=chr(c[0])
@@ -115,22 +116,24 @@ def wp():
 def prg():
 	load(TFN);display.show(Image.TSHIRT);wp();display.clear();PC=0;PM=BT
 	while PM:
-		IN=p[PC]>>4;DT=p[PC]&15;sh(IN,0);sh(DT,1);sh(PC,4);sh(PC>>4,3);display.set_pixel(0,0,5);display.set_pixel(0,1,0);ED=BT
+		IN=p[PC]>>4;DT=p[PC]&15;sh(IN,0);sh(DT,1);sh(PC,4);sh(PC>>4,3);display.set_pixel(0,0,5);display.set_pixel(0,1,0);ED=BT;NE=BT
 		while ED:
 			while not(PRG.is_pressed()or SEL.is_pressed()):0
 			sleep(100)
 			if PRG.is_pressed()and SEL.is_pressed():PM=BF;break
 			if SEL.is_pressed():
+				if NE:NE=BF;IN=-1
 				while SEL.is_pressed():IN=IN+1&15;p[PC]=(IN<<4)+DT;sh(IN,0);sleep(250)
 				continue
 			ED=BF
 		if not PM:break
-		display.set_pixel(0,0,0);display.set_pixel(0,1,5);wp();ED=BT
+		display.set_pixel(0,0,0);display.set_pixel(0,1,5);wp();ED=BT;NE=BT
 		while ED:
 			while not(PRG.is_pressed()or SEL.is_pressed()):0
 			sleep(100)
 			if PRG.is_pressed()and SEL.is_pressed():PM=BF;break
 			if SEL.is_pressed():
+				if NE:NE=BF;DT=-1
 				while SEL.is_pressed():DT=DT+1&15;p[PC]=(IN<<4)+DT;sh(DT,1);sleep(250)
 				continue
 			ED=BF
@@ -141,8 +144,11 @@ def init():
 	for i in range(E2E):p[i]=255
 	for i in range(4):DI[i].set_pull(DI[i].PULL_UP)
 	for i in range(6):SB[i]=0
+def dgo(d):
+	if d:writeln('dbg on')
+	else:writeln('dbg off')
 def run():
-	uart.init(baudrate=115200);uart.write(CR);writeln(PN+'\r\nrunning microbit TPS');A=0;B=0;C=0;D=0;E=0;F=0;PC=0;PG=0;RT=0;IN=0;DT=0;STP=0;load(TFN);display.clear()
+	DBG=pin_logo.is_touched();dgo(DBG);uart.init(baudrate=BR);uart.write(CR);writeln(PN+'\r\nrunning microbit TPS\r\nd: toggle debug, p:program mode');A=0;B=0;C=0;D=0;E=0;F=0;PC=0;PG=0;RT=0;IN=0;DT=0;STP=0;load(TFN);display.clear()
 	for i in range(E2E):
 		IN=hi_nib(i)
 		if IN==14:
@@ -150,6 +156,10 @@ def run():
 			if DT>=8 and DT<=13:SB[DT-8]=i
 	while BT:
 		IN=p[PC]>>4;DT=p[PC]&15
+		if uart.any():
+		    c=uart.read(1);ch=chr(c[0])
+		    if ch=='d':DBG=not DBG;dgo(DBG);
+		    if ch=='p':serialprg(BR);reset();
 		if DBG:
 			writeln('-');uart.write('PC: ');printHex16(PC);writeln('');uart.write('INST: ');printHex4(IN);uart.write(', DATA: ');printHex4(DT);writeln('');writeln('Register:');uart.write('A: ');printHex8(A);uart.write(', B: ');printHex8(B);uart.write(', C: ');printHex8(C);writeln('');uart.write('D: ');printHex8(D);uart.write(', E: ');printHex8(E);uart.write(', F: ');printHex8(F);writeln('');uart.write('Page: ');printHex8(PG);uart.write(', Ret: ');printHex16(RT);writeln('')
 			if ST:
@@ -275,6 +285,5 @@ def run():
 		A=A&255;B=B&255;C=C&255;D=D&255;E=E&255;F=F&255;PC=(PC+1)%E2E
 init()
 if PRG.is_pressed():prg()
-if SEL.is_pressed():serialprg()
-DBG=pin_logo.is_touched()
+if SEL.is_pressed():serialprg(9600)
 run()
