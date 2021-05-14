@@ -96,27 +96,27 @@ ppm pins: pin 3, pin 4
 
 
 
-| pin number | micro:bit function | TPS function  |
-| ---------- | ------------------ | ------------- |
-| 0          | a/d                | DOut.1        |
-| 1          | a/d                | DOut.2        |
-| 2          | a/d                | DOut.3        |
-| 3          | LED Col 3 a/d      | A/D 1, RCin 1 |
-| 4          | LED Col 1 a/d      | A/D 2, RCin 2 |
-| 5          | Button A           | PRG/S1        |
-| 6          | LED Col 4          | unusable      |
-| 7          | LED Col 2          | unusable      |
-| 8          |                    | D/A 1         |
-| 9          |                    | D/A 2         |
-| 10         | LED Col 5 a/d      | unusable      |
-| 11         | Button B           | SEL/S2        |
-| 12         | reserved           | DOut.4        |
-| 13         |                    | DIn.1         |
-| 14         |                    | DIn.2         |
-| 15         |                    | DIn.3         |
-| 16         |                    | DIn.4         |
-| 19         | I2C                | unusable      |
-| 20         | I2C                | unusable      |
+| pin number | micro:bit function | TPS function   |
+| ---------- | ------------------ | -------------- |
+| 0          | a/d                | DOut.1         |
+| 1          | a/d                | DOut.2         |
+| 2          | a/d                | DOut.3         |
+| 3          | LED Col 3 a/d      | A/D 1, RCin 1  |
+| 4          | LED Col 1 a/d      | A/D 2, RCin 2  |
+| 5          | Button A           | PRG/S1         |
+| 6          | LED Col 4          | unusable       |
+| 7          | LED Col 2          | unusable       |
+| 8          |                    | D/A 1, Servo 1 |
+| 9          |                    | D/A 2, Servo 2 |
+| 10         | LED Col 5 a/d      | unusable       |
+| 11         | Button B           | SEL/S2         |
+| 12         | reserved           | DOut.4         |
+| 13         |                    | DIn.1          |
+| 14         |                    | DIn.2          |
+| 15         |                    | DIn.3          |
+| 16         |                    | DIn.4          |
+| 19         | I2C                | unusable       |
+| 20         | I2C                | unusable       |
 
 # Debug mode
 
@@ -137,9 +137,11 @@ While the single step mode can only be set via source code, the pure debug mode 
 
 # Apendix
 
-## Image List:
+## Image List
 
 Here is the image list:
+
+0: clear display,
 1: Image.HEART,
 2: Image.HAPPY,
 3: Image.SMILE,
@@ -154,7 +156,8 @@ Here is the image list:
 12: Image.YES,
 13: Image.NO,
 14: Image.CLOCK1, 
-15: Image.CLOCK2, 
+15: Image.CLOCK2,
+
 16: Image.CLOCK3, 
 17: Image.CLOCK4, 
 18: Image.CLOCK5, 
@@ -170,7 +173,8 @@ Here is the image list:
 28: Image.ARROW_E, 
 29: Image.ARROW_SE, 
 30: Image.ARROW_S, 
-31: Image.ARROW_SW, 
+31: Image.ARROW_SW,
+
 32: Image.ARROW_W, 
 33: Image.ARROW_NW,
 34: Image.TRIANGLE,
@@ -187,6 +191,7 @@ Here is the image list:
 45: Image.MUSIC_QUAVERS,
 46: Image.PITCHFORK,
 47: Image.XMAS,
+
 48: Image.PACMAN,
 49: Image.TARGET,
 50: Image.TSHIRT,
@@ -203,3 +208,4 @@ Here is the image list:
 61: Image.UMBRELLA,
 62: Image.SNAKE,
 63: Image.HEART_SMALL
+
