@@ -12,25 +12,25 @@ To install the micro: bit TPS version, please simply copy the file microbit_tps.
 
 The actual command implementation list for the micro:bit V2: 
 
-|      | 0                                        | 1           | 2            | 3                         | 4         | 5                | 6            | 7                     |
-| ---- | ---------------------------------------- | ----------- | ------------ | ------------------------- | --------- | ---------------- | ------------ | --------------------- |
-|      | n.n.                                     | Port [DOUT] | Delay [WAIT] | Jump back relative [RJMP] | A=# [LDA] | =A               | A=           | A=Ausdruck            |
-| 0    | NOP [NOP]                                | aus         | 1ms          | 0                         | 0         | A<->B [SWAP]     |              |                       |
-| 1    | SetPixel(X,Y)<br />X=A, Y=B              | 1           | 2ms          | 1                         | 1         | B=A [MOV]        | A=B [MOV]    | A=A + 1 [INC]         |
-| 2    | ClearPixel(X,Y)<br />X=A, Y=B            | 2           | 5ms          | 2                         | 2         | C=A [MOV]        | A=C [MOV]    | A=A - 1 [DEC]         |
-| 3    | 0: ClearDisplay <br />1..63: show(Image) | 3           | 10ms         | 3                         | 3         | D=A [MOV]        | A=D [MOV]    | A=A + B [ADD]         |
-| 4    |                                          | 4           | 20ms         | 4                         | 4         | Dout=A [STA]     | Din [LDA]    | A=A - B [SUB]         |
-| 5    |                                          | 5           | 50ms         | 5                         | 5         | Dout.1=A.1 [STA] | Din.1 [LDA]  | A=A * B [MUL]         |
-| 6    |                                          | 6           | 100ms        | 6                         | 6         | Dout.2=A.1 [STA] | Din.2 [LDA]  | A=A / B [DIV]         |
-| 7    |                                          | 7           | 200ms        | 7                         | 7         | Dout.3=A.1 [STA] | Din.3 [LDA]  | A=A and B [AND]       |
-| 8    |                                          | 8           | 500ms        | 8                         | 8         | Dout.4=A.1 [STA] | Din.4 [LDA]  | A=A or B [OR]         |
-| 9    |                                          | 9           | 1s           | 9                         | 9         | PWM.1=A [STA]    | ADC.1 [LDA]  | A=A xor B [XOR]       |
-| a    |                                          | 10          | 2s           | 10                        | 10        | PWM.2=A [STA]    | ADC.2 [LDA]  | A= not A [NOT]        |
-| b    |                                          | 11          | 5s           | 11                        | 11        | Servo.1=A [STA]  | RCin.1 [LDA] | A= A % B (Rest) [MOD] |
-| c    |                                          | 12          | 10s          | 12                        | 12        | Servo.2=A [STA]  | RCin.2 [LDA] | A= A + 16 * B [BYTE]  |
-| d    |                                          | 13          | 20s          | 13                        | 13        | E=A [MOV]        | A=E [MOV]    | A= B - A[BSUBA]       |
-| e    |                                          | 14          | 30s          | 14                        | 14        | F=A [MOV]        | A=F [MOV]    | A=A SHR 1 [SHR]       |
-| f    |                                          | 15          | 60s          | 15                        | 15        | Push A [PUSH]    | Pop A [POP]  | A=A SHL 1 [SHL]       |
+|      | 0                                            | 1           | 2            | 3                         | 4         | 5                | 6            | 7                     |
+| ---- | -------------------------------------------- | ----------- | ------------ | ------------------------- | --------- | ---------------- | ------------ | --------------------- |
+|      | n.n.                                         | Port [DOUT] | Delay [WAIT] | Jump back relative [RJMP] | A=# [LDA] | =A               | A=           | A=Ausdruck            |
+| 0    | NOP [NOP]                                    | aus         | 1ms          | 0                         | 0         | A<->B [SWAP]     |              |                       |
+| 1    | SetPixel(X,Y)<br />X=A, Y=B                  | 1           | 2ms          | 1                         | 1         | B=A [MOV]        | A=B [MOV]    | A=A + 1 [INC]         |
+| 2    | ClearPixel(X,Y)<br />X=A, Y=B                | 2           | 5ms          | 2                         | 2         | C=A [MOV]        | A=C [MOV]    | A=A - 1 [DEC]         |
+| 3    | A=0: ClearDisplay <br />A=1..63: show(Image) | 3           | 10ms         | 3                         | 3         | D=A [MOV]        | A=D [MOV]    | A=A + B [ADD]         |
+| 4    |                                              | 4           | 20ms         | 4                         | 4         | Dout=A [STA]     | Din [LDA]    | A=A - B [SUB]         |
+| 5    |                                              | 5           | 50ms         | 5                         | 5         | Dout.1=A.1 [STA] | Din.1 [LDA]  | A=A * B [MUL]         |
+| 6    |                                              | 6           | 100ms        | 6                         | 6         | Dout.2=A.1 [STA] | Din.2 [LDA]  | A=A / B [DIV]         |
+| 7    |                                              | 7           | 200ms        | 7                         | 7         | Dout.3=A.1 [STA] | Din.3 [LDA]  | A=A and B [AND]       |
+| 8    |                                              | 8           | 500ms        | 8                         | 8         | Dout.4=A.1 [STA] | Din.4 [LDA]  | A=A or B [OR]         |
+| 9    |                                              | 9           | 1s           | 9                         | 9         | PWM.1=A [STA]    | ADC.1 [LDA]  | A=A xor B [XOR]       |
+| a    |                                              | 10          | 2s           | 10                        | 10        | PWM.2=A [STA]    | ADC.2 [LDA]  | A= not A [NOT]        |
+| b    |                                              | 11          | 5s           | 11                        | 11        | Servo.1=A [STA]  | RCin.1 [LDA] | A= A % B (Rest) [MOD] |
+| c    |                                              | 12          | 10s          | 12                        | 12        | Servo.2=A [STA]  | RCin.2 [LDA] | A= A + 16 * B [BYTE]  |
+| d    |                                              | 13          | 20s          | 13                        | 13        | E=A [MOV]        | A=E [MOV]    | A= B - A[BSUBA]       |
+| e    |                                              | 14          | 30s          | 14                        | 14        | F=A [MOV]        | A=F [MOV]    | A=A SHR 1 [SHR]       |
+| f    |                                              | 15          | 60s          | 15                        | 15        | Push A [PUSH]    | Pop A [POP]  | A=A SHL 1 [SHL]       |
 
 new commands for the micro:bit
 
@@ -38,7 +38,7 @@ new commands for the micro:bit
 
 **ClearPixel**: clears a pixel 
 
-**ShowImage**(image): if image is set to 0, the display is cleared, otherwise it will set a nice image on the display.  Number to image, see appendix.
+**ShowImage**(image): if image (A) is set to 0, the display is cleared, otherwise it will set a nice image on the display. Number to image, see appendix.
 
 |      | 8           | 9                              | a                                                     | b                                                    | c                 | d                         | e              | f                                     |
 | ---- | ----------- | ------------------------------ | ----------------------------------------------------- | ---------------------------------------------------- | ----------------- | ------------------------- | -------------- | ------------------------------------- |
@@ -139,73 +139,48 @@ While the single step mode can only be set via source code, the pure debug mode 
 
 ## Image List
 
+You can show a nice image on the display of the microbit. There are several images pre installed. To show a image simply put the number of the image into the A register. For images > 15 you can use this code.  As an example we want to display the T-Shirt image, which is number 50. First simple do the following calculation 50/16 = 3 with a rest of 2 (3*16+2=50)
+First put the upper bits (the 3) in to the B register. With Assembler Pseudocode this is
+
+```
+LDA 3 	A=3	0x43
+MOV B	B=A	0x51
+```
+
+Then put the 2 into the A Register and do the calulation
+
+```
+LDA 2	A=2	0x42
+BYTE	A=B*16+A	0x7C
+```
+
+And than call the display command (at the moment there is no assembler mnemonic for this)
+
+```
+n.n.	Show Image	0x03
+```
+
+So the tps program showing the t-shirt is: `43, 51, 42, 7C, 03`
+
 Here is the image list:
 
-0: clear display,
-1: Image.HEART,
-2: Image.HAPPY,
-3: Image.SMILE,
-4: Image.SAD,
-5: Image.CONFUSED,
-6: Image.ANGRY,
-7: Image.ASLEEP,
-8: Image.SURPRISED,
-9: Image.SILLY,
-10: Image.FABULOUS,
-11: Image.MEH,
-12: Image.YES,
-13: Image.NO,
-14: Image.CLOCK1, 
-15: Image.CLOCK2,
-
-16: Image.CLOCK3, 
-17: Image.CLOCK4, 
-18: Image.CLOCK5, 
-19: Image.CLOCK6, 
-20: Image.CLOCK7, 
-21: Image.CLOCK8, 
-22: Image.CLOCK9, 
-23: Image.CLOCK10, 
-24: Image.CLOCK11, 
-25: Image.CLOCK12,
-26: Image.ARROW_N, 
-27: Image.ARROW_NE, 
-28: Image.ARROW_E, 
-29: Image.ARROW_SE, 
-30: Image.ARROW_S, 
-31: Image.ARROW_SW,
-
-32: Image.ARROW_W, 
-33: Image.ARROW_NW,
-34: Image.TRIANGLE,
-35: Image.TRIANGLE_LEFT,
-36: Image.CHESSBOARD,
-37: Image.DIAMOND,
-38: Image.DIAMOND_SMALL,
-39: Image.SQUARE,
-40: Image.SQUARE_SMALL,
-41: Image.RABBIT,
-42: Image.COW,
-43: Image.MUSIC_CROTCHET,
-44: Image.MUSIC_QUAVER,
-45: Image.MUSIC_QUAVERS,
-46: Image.PITCHFORK,
-47: Image.XMAS,
-
-48: Image.PACMAN,
-49: Image.TARGET,
-50: Image.TSHIRT,
-51: Image.ROLLERSKATE,
-52: Image.DUCK,
-53: Image.HOUSE,
-54: Image.TORTOISE,
-55: Image.BUTTERFLY,
-56: Image.STICKFIGURE,
-57: Image.GHOST,
-58: Image.SWORD,
-59: Image.GIRAFFE,
-60: Image.SKULL,
-61: Image.UMBRELLA,
-62: Image.SNAKE,
-63: Image.HEART_SMALL
+| upper nibble     | 0                  | 1                  | 2                        | 3                     |
+| ---------------- | ------------------ | ------------------ | ------------------------ | --------------------- |
+| **lower nibble** |                    |                    |                          |                       |
+| 0                | 0: clear display,  | 16: Image.CLOCK3   | 32: Image.ARROW_W        | 48: Image.PACMAN      |
+| 1                | 1: Image.HEART     | 17: Image.CLOCK4   | 33: Image.ARROW_NW       | 49: Image.TARGET      |
+| 2                | 2: Image.HAPPY     | 18: Image.CLOCK5   | 34: Image.TRIANGLE       | 50: Image.TSHIRT      |
+| 3                | 3: Image.SMILE     | 19: Image.CLOCK6   | 35: Image.TRIANGLE_LEFT  | 51: Image.ROLLERSKATE |
+| 4                | 4: Image.SAD       | 20: Image.CLOCK7   | 36: Image.CHESSBOARD     | 52: Image.DUCK        |
+| 5                | 5: Image.CONFUSED  | 21: Image.CLOCK8   | 37: Image.DIAMOND        | 53: Image.HOUSE       |
+| 6                | 6: Image.ANGRY     | 22: Image.CLOCK9   | 38: Image.DIAMOND_SMALL  | 54: Image.TORTOISE    |
+| 7                | 7: Image.ASLEEP    | 23: Image.CLOCK10  | 39: Image.SQUARE         | 55: Image.BUTTERFLY   |
+| 8                | 8: Image.SURPRISED | 24: Image.CLOCK11  | 40: Image.SQUARE_SMALL   | 56: Image.STICKFIGURE |
+| 9                | 9: Image.SILLY     | 25: Image.CLOCK12  | 41: Image.RABBIT         | 57: Image.GHOST       |
+| A                | 10: Image.FABULOUS | 26: Image.ARROW_N  | 42: Image.COW            | 58: Image.SWORD       |
+| B                | 11: Image.MEH      | 27: Image.ARROW_NE | 43: Image.MUSIC_CROTCHET | 59: Image.GIRAFFE     |
+| C                | 12: Image.YES      | 28: Image.ARROW_E  | 44: Image.MUSIC_QUAVER   | 60: Image.SKULL       |
+| D                | 13: Image.NO       | 29: Image.ARROW_SE | 45: Image.MUSIC_QUAVERS  | 61: Image.UMBRELLA    |
+| E                | 14: Image.CLOCK1   | 30: Image.ARROW_S  | 46: Image.PITCHFORK      | 62: Image.SNAKE       |
+| F                | 15: Image.CLOCK2   | 31: Image.ARROW_SW | 47: Image.XMAS           | 63: Image.HEART_SMALL |
 
