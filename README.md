@@ -1,3 +1,6 @@
+Hi, just a shorrt remark, this repo is frozen. All things done here are now in my PYthon_TPS Repo. 
+You will find it here: https://github.com/willie68/PythonTPS_SPS
+
 # micro:bit TPS
 
 This is my implementation of the TPS. The instructions will be compatible to my ArduinoSPS Version. And you will get some nice new Commands, implementing some of the micro:bit features, like images, Soundlevel, Logo...
